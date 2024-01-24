@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { MassService } from './mass.service';
 import { CreateMassDto } from './dto/create-mass.dto';
 import { UpdateMassDto } from './dto/update-mass.dto';
+import { PaginationQueryDto } from 'src/common/dto/pagionation-query.dto';
 
 @Controller('mass')
 export class MassController {
@@ -13,22 +14,22 @@ export class MassController {
   }
 
   @Get()
-  findAll() {
-    return this.massService.findAll();
+  findAll(@Body() query: PaginationQueryDto) {
+    return this.massService.findAll(query);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.massService.findOne(+id);
+  @Get(':UUID')
+  findOne(@Param('UUID') UUID: string) {
+    return this.massService.findOne(UUID);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMassDto: UpdateMassDto) {
-    return this.massService.update(+id, updateMassDto);
+  @Patch()
+  update(@Body() updateMassDto: UpdateMassDto) {
+    return this.massService.update(updateMassDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.massService.remove(+id);
+  @Delete(':UUID')
+  remove(@Param('UUID') UUID: string) {
+    return this.massService.remove(UUID);
   }
 }

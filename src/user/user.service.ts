@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { PaginationQueryDto } from 'src/common/dto/pagionation-query.dto';
 
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { User } from './entities/user.entity';
-import { UserRoles } from './enums/user.enum';
+import { UserRoles } from './enums/userRoles.enum';
 
 @Injectable()
 export class UserService {
@@ -20,7 +21,7 @@ export class UserService {
     const existingUser = await this.userRepository.findOne({ where: { email: createUserDto.email }})
 
     if (existingUser) {
-      throw new BadRequestException(`An account with that email already exists.`)
+      throw new BadRequestException(`A user with that email already exists.`)
     }
 
     const newUser = await this.userRepository.create(createUserDto)
@@ -31,19 +32,39 @@ export class UserService {
     return newUser
   }
 
-  findAll() {
-    return `This action returns all user`;
+  async findAll(query: PaginationQueryDto) {
+    const users = await this.userRepository.find({
+      skip: query.offset,
+      take: query.limit
+    })
+    return users
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(UUID: string) {
+    const user = await this.userRepository.findOne({
+      where: {
+        UUID: UUID
+      }
+    })
+    if (!user) {
+      throw new NotFoundException('A user with that UUID does not exist.')
+    }
+    return user
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(updateUserDto: UpdateUserDto) {
+    const updatedUser = await this.userRepository.preload({
+      ...updateUserDto
+    })
+    if (!updatedUser) {
+      throw new NotFoundException('A user with that UUID does not exist.')
+    }
+    await this.userRepository.save(updatedUser)
+    return updatedUser
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(UUID: string) {
+    const user = await this.findOne(UUID)
+    return this.userRepository.remove(user)
   }
 }
