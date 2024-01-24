@@ -4,11 +4,13 @@ import { MassController } from './mass.controller';
 
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Mass } from './entities/mass.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      Mass
+      Mass,
+      User
     ])
   ],
   controllers: [MassController],

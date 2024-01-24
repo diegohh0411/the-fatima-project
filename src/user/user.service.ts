@@ -35,7 +35,10 @@ export class UserService {
   async findAll(query: PaginationQueryDto) {
     const users = await this.userRepository.find({
       skip: query.offset,
-      take: query.limit
+      take: query.limit,
+      relations: {
+        massesToCelebrate: true
+      }
     })
     return users
   }
@@ -44,6 +47,9 @@ export class UserService {
     const user = await this.userRepository.findOne({
       where: {
         UUID: UUID
+      },
+      relations: {
+        massesToCelebrate: true
       }
     })
     if (!user) {

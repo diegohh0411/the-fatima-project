@@ -1,5 +1,6 @@
 import { Column, Entity, ManyToMany, PrimaryColumn } from "typeorm"
 import { UserRoles } from "../enums/userRoles.enum"
+import { Mass } from "src/mass/entities/mass.entity"
 
 @Entity()
 export class User {
@@ -20,4 +21,10 @@ export class User {
         enum: UserRoles
     })
     role: UserRoles
+
+    @ManyToMany(
+        type => Mass,
+        mass => mass.celebratingPriests
+    )
+    massesToCelebrate: Mass[]
 }

@@ -1,6 +1,8 @@
-import { Column, Entity, ManyToMany, PrimaryColumn } from "typeorm"
+import { Column, Entity, ManyToMany, PrimaryColumn, JoinTable } from "typeorm"
 import { Weekdays } from "../enums/weekdays.enum"
 import { Hours } from "../enums/hours.enum"
+
+import { User } from "src/user/entities/user.entity"
 
 @Entity()
 export class Mass {
@@ -21,4 +23,14 @@ export class Mass {
 
     @Column({ nullable: true })
     note: string
+
+    @JoinTable()
+    @ManyToMany(
+        type => User,
+        user => user.massesToCelebrate,
+        {
+            cascade: ['update']
+        }
+    )
+    celebratingPriests: User[]
 }
