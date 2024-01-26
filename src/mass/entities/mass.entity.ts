@@ -1,6 +1,4 @@
 import { Column, Entity, ManyToMany, PrimaryColumn, JoinTable } from "typeorm"
-import { Weekdays } from "../enums/weekdays.enum"
-import { Hours } from "../enums/hours.enum"
 
 import { User } from "src/user/entities/user.entity"
 
@@ -9,17 +7,8 @@ export class Mass {
     @PrimaryColumn({ nullable: false })
     UUID: string
 
-    @Column({
-        type: 'enum',
-        enum: Weekdays
-    })
-    weekday: Weekdays
-
-    @Column({
-        type: 'enum',
-        enum: Hours
-    })
-    hour: Hours
+    @Column({ unique: true })
+    recurrence: string
 
     @Column({ nullable: true })
     note: string

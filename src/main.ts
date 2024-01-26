@@ -12,6 +12,7 @@ async function bootstrap() {
       enableImplicitConversion: true
     }
   }))
+  app.enableCors()
   await app.listen(3000);
 }
 bootstrap();

@@ -10,4 +10,8 @@ export class CreateUserDto {
     @IsString()
     @IsOptional()
     last_name: string
+
+    @IsString()
+    @IsOptional()
+    about: string
 }

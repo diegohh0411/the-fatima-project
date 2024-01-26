@@ -16,6 +16,9 @@ export class User {
     @Column({ nullable: true })
     last_name: string
 
+    @Column({ nullable: true })
+    about: string
+
     @Column({
         type: 'enum',
         enum: UserRoles

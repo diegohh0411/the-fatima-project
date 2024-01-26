@@ -21,9 +21,41 @@ export class MassService {
   ) {}
 
   async create(createMassDto: CreateMassDto) {
-    const newMass = await this.massRepository.create(createMassDto)
+    let celebratingPriestsUUIDs = createMassDto.celebratingPriestsUUIDs
+    delete createMassDto.celebratingPriestsUUIDs
+    const createMassObject = {
+      ...(createMassDto as Omit<CreateMassDto, 'celebratingPriestsUUIDs'>),
+      celebratingPriests: [] as User[]
+    }
+    if (celebratingPriestsUUIDs) {
+      for (let i = 0; i < celebratingPriestsUUIDs.length; i++) {
+        const priestUUID = celebratingPriestsUUIDs[i]
+        const user = await this.userRepository.findOne({
+          where: { UUID: priestUUID},
+          relations: {
+            massesToCelebrate: true
+          }
+        })
+  
+        if (!user) {
+          throw new NotFoundException(`A user with UUID ${priestUUID} does not exist.`)
+        } else if (user.role !== UserRoles.priest) {
+          throw new BadRequestException(`The user with UUID ${priestUUID} does not have the role of ${UserRoles.priest}.`)
+        }
+  
+        createMassObject.celebratingPriests.push(user)
+      }
+    } else {
+      delete createMassObject.celebratingPriests
+    }
+
+    const newMass = await this.massRepository.create(createMassObject)
     newMass.UUID = crypto.randomUUID()
-    await this.massRepository.save(newMass)
+    try {
+      await this.massRepository.save(newMass)
+    } catch (e) {
+      throw new BadRequestException(e.detail)
+    }
     return newMass
   }
 
@@ -88,7 +120,12 @@ export class MassService {
     if (!updatedMass) {
       throw new NotFoundException('A mass with that UUID does not exist.')
     }
-    await this.massRepository.save(updatedMass)
+
+    try {
+      await this.massRepository.save(updatedMass)
+    } catch (e) {
+      throw new BadRequestException(e.detail)
+    }
     return updatedMass     
   }
 

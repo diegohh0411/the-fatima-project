@@ -1,15 +1,14 @@
 import { IsString, IsOptional, IsEnum } from "class-validator"
-import { Weekdays } from "../enums/weekdays.enum"
-import { Hours } from "../enums/hours.enum"
+import { IsRFC5545 } from "src/common/decorator/rfc5545.decorator"
 
 export class CreateMassDto {
-    @IsEnum(Weekdays)
-    weekday: Weekdays
-
-    @IsEnum(Hours)
-    hour: Hours
+    @IsRFC5545()
+    recurrence: string
 
     @IsString()
     @IsOptional()
     note: string
+
+    @IsOptional()
+    celebratingPriestsUUIDs: string[]
 }
